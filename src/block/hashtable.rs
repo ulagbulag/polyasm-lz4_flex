@@ -26,10 +26,9 @@ fn hash(sequence: u32) -> u32 {
 #[cfg(target_pointer_width = "64")]
 #[inline]
 fn hash5(sequence: usize) -> u32 {
-    let primebytes = if cfg!(target_endian = "little") {
-        889523592379_usize
-    } else {
-        11400714785074694791_usize
+    let primebytes = cfg_select! {
+        any(target_endian = "little", target_abi = "polyasm") => 889523592379_usize,
+        _ => 11400714785074694791_usize,
     };
     (((sequence << 24).wrapping_mul(primebytes)) >> 48) as u32
 }
